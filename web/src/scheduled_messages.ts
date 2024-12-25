@@ -194,18 +194,32 @@ export function get_selected_send_later_timestamp(): number | undefined {
     if (!selected_send_later_timestamp) {
         return undefined;
     }
+    if (message_scheduled_too_soon) {
+        const current_time = Math.floor(Date.now() / 1000);
+        return current_time + MINIMUM_SCHEDULED_MESSAGE_DELAY_SECONDS;
+    }
     return selected_send_later_timestamp;
 }
 
 export function get_formatted_selected_send_later_time(): string | undefined {
-    if (!selected_send_later_timestamp) {
+    const adjusted_timestamp = get_selected_send_later_timestamp();
+    if (!adjusted_timestamp) {
         return undefined;
     }
-    return timerender.get_full_datetime(new Date(selected_send_later_timestamp * 1000), "time");
+    return timerender.get_full_datetime(new Date(adjusted_timestamp * 1000), "time");
 }
+
+export let message_scheduled_too_soon = false;
 
 export function set_selected_schedule_timestamp(timestamp: number): void {
     selected_send_later_timestamp = timestamp;
+
+    const current_time = Math.floor(Date.now() / 1000);
+    if (selected_send_later_timestamp < current_time + MINIMUM_SCHEDULED_MESSAGE_DELAY_SECONDS) {
+        message_scheduled_too_soon = true;
+    } else {
+        message_scheduled_too_soon = false;
+    }
 }
 
 export function reset_selected_schedule_timestamp(): void {

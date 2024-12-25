@@ -70,10 +70,7 @@ export function open_send_later_menu() {
                     do_schedule_message,
                     new Date(current_time.getTime() + 60 * 60 * 1000),
                     {
-                        minDate: new Date(
-                            current_time.getTime() +
-                                scheduled_messages.MINIMUM_SCHEDULED_MESSAGE_DELAY_SECONDS * 1000,
-                        ),
+                        minDate: new Date(current_time.getTime()),
                         onClose() {
                             // Return to normal state.
                             $send_later_modal_content.css("pointer-events", "all");

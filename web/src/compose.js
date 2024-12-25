@@ -3,6 +3,7 @@
 import autosize from "autosize";
 import $ from "jquery";
 
+import render_message_rescheduled_banner from "../templates/compose_banner/message_rescheduled_banner.hbs";
 import render_success_message_scheduled_banner from "../templates/compose_banner/success_message_scheduled_banner.hbs";
 import render_wildcard_mention_not_allowed_error from "../templates/compose_banner/wildcard_mention_not_allowed_error.hbs";
 
@@ -375,10 +376,21 @@ function schedule_message_to_custom_date() {
     const success = function (data) {
         drafts.draft_model.deleteDraft(draft_id);
         clear_compose_box();
-        const new_row_html = render_success_message_scheduled_banner({
-            scheduled_message_id: data.scheduled_message_id,
-            deliver_at,
-        });
+
+        let new_row_html;
+
+        if (!scheduled_messages.message_scheduled_too_soon) {
+            new_row_html = render_success_message_scheduled_banner({
+                scheduled_message_id: data.scheduled_message_id,
+                deliver_at,
+            });
+        } else {
+            new_row_html = render_message_rescheduled_banner({
+                scheduled_message_id: data.scheduled_message_id,
+                deliver_at,
+            });
+        }
+
         compose_banner.clear_message_sent_banners();
         compose_banner.append_compose_banner_to_banner_list($(new_row_html), $banner_container);
     };
